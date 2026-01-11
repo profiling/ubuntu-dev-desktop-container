@@ -1,0 +1,20 @@
+services:
+  webtop:
+    image: lscr.io/linuxserver/webtop:ubuntu-mate
+    container_name: webtop
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      TITLE: ${WEBTOP_TITLE:-Ubuntu Webtop}
+    ports:
+      - "${WEBTOP_PORT:-3000}:3000"
+    volumes:
+      - "${WEBTOP_CONFIG_DIR:-./config}:/config"
+      - "${WEBTOP_WORKSPACE_DIR:-./workspace}:/workspace"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    shm_size: "1gb"
