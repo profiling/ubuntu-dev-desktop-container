@@ -6,3 +6,4 @@
   - A rollback method for the changes made that round.
 - Avoid expanding scope; only touch files explicitly requested.
 - Keep instructions and outputs concise and actionable.
+- Commit messages follow Conventional Commits (type: summary, imperative, <=72 chars).
