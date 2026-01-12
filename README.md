@@ -4,6 +4,21 @@ Reproducible Ubuntu GUI development environment using containers (webtop), desig
 
 This repository runs an Ubuntu MATE desktop in your browser using `lscr.io/linuxserver/webtop:ubuntu-mate`.
 
+## Build image
+
+This project now builds a local image with a minimal tooling layer on top of `lscr.io/linuxserver/webtop:ubuntu-mate`.
+Node.js and npm are installed from the Ubuntu official repositories to avoid external setup scripts and keep installs reliable behind mainland China mirrors.
+
+Build args:
+
+- `APT_MIRROR` (default `mirrors.aliyun.com`) for mainland China acceleration. Example: `mirrors.tuna.tsinghua.edu.cn`.
+
+Build command:
+
+```bash
+docker compose build
+```
+
 ## Requirements
 
 - Windows 11/10 with WSL2
@@ -37,6 +52,28 @@ If `localhost` does not work in your Windows browser, try the WSL2 IP or ensure 
 
 - `config` -> `/config` (webtop configuration and persistence)
 - `workspace` -> `/workspace` (project workspace inside the container)
+
+## Verify tool versions
+
+Start the container if it is not already running:
+
+```bash
+docker compose up -d
+```
+
+Verify core tools inside the container:
+
+```bash
+docker compose exec -T webtop git --version
+docker compose exec -T webtop node --version
+docker compose exec -T webtop python3 --version
+```
+
+Expected output (examples):
+
+- `git version 2.x`
+- `v18.x.x` (Ubuntu default for 24.04 at the time of writing)
+- `Python 3.x.x`
 
 ## Stop and remove
 
@@ -82,3 +119,18 @@ docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_SETUID'
 # Cleanup
 docker compose down
 ```
+## Acceptance (this change)
+
+Commands:
+
+```bash
+docker compose build
+docker compose up -d
+docker compose exec -T webtop npm --version
+```
+
+Expected output:
+
+- build completes without errors
+- container is running
+- `npm` prints a version number (e.g., `9.x.x`)
