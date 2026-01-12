@@ -34,6 +34,7 @@ cp .env.example .env
 ```
 
 2) Edit `.env` and set `PUID`, `PGID`, and `TZ` for your user.
+   - **Note**: Set `TZ` to your local timezone (e.g., `America/New_York`, `Europe/London`, `Asia/Shanghai`). The example uses `Etc/UTC` as a universal default.
 
 3) Start the container:
 
@@ -82,6 +83,42 @@ docker compose down
 
 To delete the persistent data, remove the `config` and `workspace` directories (or the named volumes if you switch to volumes).
 
+## Testing
+
+### Manual verification
+
+After starting the container, verify functionality works under `no-new-privileges`:
+
+1. **Desktop loads**: Open `http://localhost:3000` and confirm the MATE desktop renders
+2. **Terminal works**: Open a terminal in the desktop and run basic commands (`ls`, `ps`, `whoami`)
+3. **File operations**: Create, edit, and delete files in `/workspace` to verify CHOWN/FOWNER/DAC_OVERRIDE capabilities
+4. **Process management**: Launch and close applications (e.g., text editor, file manager) to verify SETUID/SETGID capabilities
+
+### Smoke tests (CI-friendly)
+
+```bash
+# Start container
+docker compose up -d
+
+# Wait for container to be ready
+sleep 10
+
+# Check container is running
+docker compose ps | grep webtop | grep -q "Up"
+
+# Check web interface is responding
+curl -f http://localhost:${WEBTOP_PORT:-3000} > /dev/null
+
+# Check no-new-privileges is active
+docker inspect webtop | jq -r '.[0].HostConfig.SecurityOpt[]' | grep -q 'no-new-privileges:true'
+
+# Check capabilities are correctly set
+docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_CHOWN'
+docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_SETUID'
+
+# Cleanup
+docker compose down
+```
 ## Acceptance (this change)
 
 Commands:
