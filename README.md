@@ -70,10 +70,10 @@ sleep 10
 docker compose ps | grep webtop | grep -q "Up"
 
 # Check web interface is responding
-curl -f http://localhost:3000 > /dev/null
+curl -f http://localhost:${WEBTOP_PORT:-3000} > /dev/null
 
 # Check no-new-privileges is active
-docker inspect webtop | grep -q '"NoNewPrivileges":true'
+docker inspect webtop | jq -r '.[0].HostConfig.SecurityOpt[]' | grep -q 'no-new-privileges:true'
 
 # Check capabilities are correctly set
 docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_CHOWN'
