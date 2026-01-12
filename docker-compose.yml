@@ -1,6 +1,10 @@
 services:
   webtop:
-    image: lscr.io/linuxserver/webtop:ubuntu-mate
+    build:
+      context: .
+      args:
+        APT_MIRROR: ${APT_MIRROR:-mirrors.aliyun.com}
+    image: ubuntu-dev-desktop-container:local
     container_name: webtop
     environment:
       PUID: ${PUID}
