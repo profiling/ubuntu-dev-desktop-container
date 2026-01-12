@@ -15,3 +15,7 @@
 tmp/
 .tmp/
 .cache/
+
+# webtop configuration
+config/
+workspace/
