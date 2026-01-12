@@ -73,11 +73,11 @@ docker compose ps | grep webtop | grep -q "Up"
 curl -f http://localhost:3000 > /dev/null
 
 # Check no-new-privileges is active
-docker inspect webtop | grep -q "no-new-privileges:true"
+docker inspect webtop | grep -q '"NoNewPrivileges":true'
 
 # Check capabilities are correctly set
-docker inspect webtop | grep -A 20 CapAdd | grep -q "CAP_CHOWN"
-docker inspect webtop | grep -A 20 CapAdd | grep -q "CAP_SETUID"
+docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_CHOWN'
+docker inspect webtop | jq -r '.[0].HostConfig.CapAdd[]' | grep -q 'CAP_SETUID'
 
 # Cleanup
 docker compose down
