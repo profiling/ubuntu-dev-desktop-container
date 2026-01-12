@@ -1,6 +1,10 @@
 services:
   webtop:
-    image: lscr.io/linuxserver/webtop:ubuntu-mate
+    build:
+      context: .
+      args:
+        APT_MIRROR: ${APT_MIRROR:-mirrors.aliyun.com}
+    image: ubuntu-dev-desktop-container:local
     container_name: webtop
     environment:
       PUID: ${PUID}
@@ -14,6 +18,12 @@ services:
       - "${WEBTOP_WORKSPACE_DIR:-./workspace}:/workspace"
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - FOWNER
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
